@@ -2,9 +2,9 @@ import Bills from '../models/Bills.js';
 
 const createBills = async (req, res) => {
     try {
-        const { name, value, installments, isRecurring, nextPaymentDate, description } = req.body;
+        const { name, value, installments, installmentsPayed, isRecurring, nextPaymentDate, description } = req.body;
 
-        const bills = new Bills({ name, value, installments, isRecurring, nextPaymentDate, description });
+        const bills = new Bills({ name, value, installments, isRecurring, installmentsPayed, nextPaymentDate, description });
         await bills.save();
 
         res.status(201).json({ message: 'Bill created successfully' });

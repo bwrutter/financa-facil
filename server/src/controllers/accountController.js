@@ -5,14 +5,11 @@ const createAccount = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Verifica se o e-mail já está em uso
         const existingAccount = await Account.findOne({ email });
         if (existingAccount) return res.status(400).json({ error: 'Email already registered' });
 
-        // Criptografa a senha
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Cria a conta
         const account = new Account({ name, email, password: hashedPassword });
         await account.save();
 

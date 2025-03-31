@@ -13,6 +13,10 @@ const BillsSchema = new mongoose.Schema({
         type: Number, 
         default: 1
     },
+    installmentsPayed: { 
+        type: Number, 
+        default: 0
+    },
     isRecurring: { 
         type: Boolean, 
         default: false

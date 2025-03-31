@@ -37,6 +37,28 @@ const getBillById = async (req, res) => {
     }
 };
 
+const updateBill = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, value, installments, installmentsPayed, isRecurring, nextPaymentDate, description } = req.body;
+
+        const updatedBill = await Bills.findByIdAndUpdate(
+            id,
+            { name, value, installments, installmentsPayed, isRecurring, nextPaymentDate, description },
+            { new: true }
+        );
+
+        if (!updatedBill) {
+            return res.status(404).json({ error: 'Bill not found' });
+        }
+
+        res.json({ message: 'Bill updated successfully', updatedBill });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 const deleteBill = async (req, res) => {
     try {
         const { id } = req.params;
@@ -47,4 +69,4 @@ const deleteBill = async (req, res) => {
     }
 };
 
-export { createBills, getBills, getBillById, deleteBill };
+export { createBills, getBills, getBillById, updateBill, deleteBill };

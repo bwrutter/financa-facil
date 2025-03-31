@@ -1,0 +1,29 @@
+{
+  "name": "api-contas",
+  "version": "1.0.0",
+  "description": "API de cadastro de contas usando Express e MongoDB",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^7.8.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "keywords": [
+    "api",
+    "express",
+    "mongodb",
+    "nodejs"
+  ],
+  "author": "Seu Nome",
+  "license": "MIT"
+}

@@ -77,20 +77,19 @@ const Skeleton = styled('div')(({ theme, height }) => ({
 }));
 
 export default function Drawer(props) {
-  const { window } = props;
+  const { window, children } = props;
 
-  const router = useRouter('/dashboard');
   const demoWindow = window ? window() : undefined;
 
   return (
     <AppProvider
       navigation={NAVIGATION}
-      router={router}
       theme={theme}
       window={demoWindow}
     >
       <DashboardLayout>
         <PageContainer>
+          {children}
           <Grid container spacing={1}>
             <Grid size={5} />
             <Grid size={12}>

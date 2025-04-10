@@ -28,12 +28,12 @@ export default function Bills() {
   const [error, setError] = useState(null);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 5,
+    pageSize: 10,
   });
   const [open, setOpen] = useState(false);
   const [newBill, setNewBill] = useState({
     name: '',
-    value: '',
+    value: 0,
     installments: 1,
     nextPaymentDate: new Date(),
     isRecurring: false,
@@ -147,7 +147,6 @@ export default function Bills() {
   };
 
   const handleDelete = async (id) => {
-    console.log(id)
     if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
       setLoading(true);
       try {
@@ -165,6 +164,27 @@ export default function Bills() {
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Grid mr={2} >
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+                <DatePicker
+                  label="De:"
+                  value={newBill.nextPaymentDate}
+                  onChange={handleDateChange}
+                  slotProps={{ textField: { fullWidth: true, margin: 'dense', size: 'small' } }}
+                  
+                />
+            </LocalizationProvider>
+        </Grid>
+        <Grid mr={2} >
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+                <DatePicker
+                  label="Até:"
+                  value={newBill.nextPaymentDate}
+                  onChange={handleDateChange}
+                  slotProps={{ textField: { fullWidth: true, margin: 'dense', size: 'small' } }}
+                />
+            </LocalizationProvider>
+        </Grid>
         <Button 
           variant="contained" 
           onClick={handleGetBills} 

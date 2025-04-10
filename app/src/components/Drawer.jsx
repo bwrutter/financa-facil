@@ -64,6 +64,9 @@ export default function Drawer(props) {
       navigation={NAVIGATION}
       theme={theme}
       window={demoWindow}
+      branding={{
+        title: 'Finança Fácil',
+      }}
     >
       <DashboardLayout>
         <PageContainer>

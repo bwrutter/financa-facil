@@ -1,6 +1,6 @@
 export const formatterAmount = (value) => {
     if (typeof value !== 'number') return '';
-    return (value / 100).toLocaleString('pt-BR', {
+    return (value).toLocaleString('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     });

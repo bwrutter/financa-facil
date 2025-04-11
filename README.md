@@ -1,6 +1,8 @@
 # financa-facil
-Aplicativo para finanças pessoais
+Aplicativo para finanças pessoais (Em construção)
 
 # tecnologias
-Front: React
+Login: Firebase
+Front: React + daisyUi
 Back: Express + Node
+BD: Mongo

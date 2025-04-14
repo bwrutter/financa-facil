@@ -1,7 +1,16 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/contas');
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200">
@@ -21,4 +30,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;

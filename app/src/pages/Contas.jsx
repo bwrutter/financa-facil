@@ -12,7 +12,7 @@ const Contas = () => {
 
   const adicionarConta = () => {
     const novaConta = {
-      id: Date.now(), // gera um id único
+      id: Date.now(),
       nome,
       saldo: parseFloat(saldo),
       tipo,
@@ -20,7 +20,6 @@ const Contas = () => {
 
     setContas([...contas, novaConta]);
 
-    // Limpa os inputs
     setNome('');
     setSaldo('');
     setTipo('Bancária');

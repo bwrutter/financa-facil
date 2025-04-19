@@ -10,7 +10,7 @@ Este projeto é um **monorepo** com as seguintes tecnologias:
 
 - 🔐 **Login:** Firebase  
 - 🎨 **Frontend:** React + DaisyUI  
-- 🚀 **Backend:** Node.js + Express  
+- 🚀 **Backend:** Node.js + Express + Swagger (/api/docs)
 - 🗄️ **Banco de Dados:** MongoDB (MongoDB Atlas)
 
 ---

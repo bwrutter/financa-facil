@@ -63,7 +63,7 @@ PORT=5000
 
 ### 4. Populando o banco com dados de exemplo (opcional)
 
-Você pode rodar um comando para inserir alguns registros iniciais no banco:
+Você pode rodar um comando (na raiz do projeto, ou direto no back) para inserir alguns registros iniciais no banco:
 
 ```bash
 npm run seed

@@ -17,7 +17,7 @@ Este projeto é um **monorepo** com as seguintes tecnologias:
 
 ## 🛠️ Como rodar o projeto
 
-> ⚠️ No momento, o projeto está preparado apenas para rodar em ambiente local. Futuramente será feito o deploy na **Google Cloud Platform (GCP)**, outro detalhe é que o front tem apenas uma estrutura inicial que deve ser desconsiderado, pois estou focando no back-end do projeto nesse momento.
+> ⚠️ No momento, o projeto está preparado apenas para rodar em ambiente local. Futuramente será feito o deploy na **Google Cloud Platform (GCP)**.
 
 ---
 
@@ -74,6 +74,7 @@ npm run seed
 ## 📌 Observações
 
 - O projeto ainda está em desenvolvimento. Algumas funcionalidades podem não estar disponíveis ou estáveis.
+- Outro detalhe é que o front-end tem apenas uma estrutura inicial que deve ser desconsiderada, pois estou focando no back-end do projeto nesse momento.
 - Em breve será adicionado o deploy para produção via GCP.
 
 ---

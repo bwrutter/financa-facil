@@ -107,40 +107,6 @@ paths:
         200:
           description: Categoria deletada
 
-  /api/payment-form:
-    get:
-      summary: Lista todas as formas de pagamento
-      tags: [PaymentForm]
-      responses:
-        200:
-          description: Lista de formas de pagamento
-    post:
-      summary: Cria uma nova forma de pagamento
-      tags: [PaymentForm]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PaymentMethod'
-      responses:
-        201:
-          description: Forma de pagamento criada
-
-  /api/payment-form/{id}:
-    delete:
-      summary: Deleta uma forma de pagamento
-      tags: [PaymentForm]
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
-      responses:
-        200:
-          description: Forma de pagamento deletada
-
 components:
   schemas:
     Bill:
@@ -163,16 +129,8 @@ components:
           type: string
         category:
           type: string
-        paymentMethod:
-          type: string
-
+          
     Category:
-      type: object
-      properties:
-        name:
-          type: string
-
-    PaymentMethod:
       type: object
       properties:
         name:

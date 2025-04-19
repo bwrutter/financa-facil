@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "financa-facil",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "dev:server": "nodemon server/src/server.js",
-    "dev:app": "vite"
+    "dev:app": "vite",
+    "seed": "concurrently \"npm run seed --workspace server\""
   },
   "dependencies": {
     "axios": "^1.8.4",

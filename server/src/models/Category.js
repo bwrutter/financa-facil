@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 
 const CategorySchema = new mongoose.Schema({
-    nome: {
-        type: String, //exemplo: Alimentação, Transporte, Saúde, Streaming
+    name: {
+        type: String, //exemplo: Alimentação, Transporte, Saúde, Streaming, Outros
         required: true
     },
-    usuarioId: {
-        type: mongoose.Schema.Types.ObjectId, 
+    userId: {
+        type: String, 
         ref: 'User',
         required: true
     }

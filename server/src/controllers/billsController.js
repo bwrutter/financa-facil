@@ -10,8 +10,7 @@ const createBills = async (req, res) => {
             isRecurring,
             nextPaymentDate,
             description,
-            category,
-            paymentForm
+            category
         } = req.body;
 
         const bills = new Bills({
@@ -22,8 +21,7 @@ const createBills = async (req, res) => {
             isRecurring,
             nextPaymentDate,
             description,
-            category,
-            paymentForm
+            category
         });
 
         await bills.save();
@@ -37,11 +35,10 @@ const createBills = async (req, res) => {
 
 const getBills = async (req, res) => {
     try {
-      const accounts = await Bills.find()
+      const bills = await Bills.find()
         .populate('category')
-        .populate('paymentForm');
   
-      res.json(accounts);
+      res.json(bills);
     } catch (error) {
       console.error('Erro ao buscar contas:', error.message);
   
@@ -55,15 +52,14 @@ const getBills = async (req, res) => {
 
 const getBillById = async (req, res) => {
     try {
-        const account = await Bills.findById(req.params.id)
+        const bills = await Bills.findById(req.params.id)
             .populate('category')
-            .populate('paymentForm');
 
-        if (!account) {
+        if (!bills) {
             return res.status(404).json({ error: 'Bill not found' });
         }
 
-        res.json(account);
+        res.json(bills);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -81,8 +77,7 @@ const updateBill = async (req, res) => {
             isRecurring,
             nextPaymentDate,
             description,
-            category,
-            paymentForm
+            category
         } = req.body;
 
         const updatedBill = await Bills.findByIdAndUpdate(
@@ -95,8 +90,7 @@ const updateBill = async (req, res) => {
                 isRecurring,
                 nextPaymentDate,
                 description,
-                category,
-                paymentForm
+                category
             },
             { new: true }
         );

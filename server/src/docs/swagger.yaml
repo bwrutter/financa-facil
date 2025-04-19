@@ -1,0 +1,179 @@
+openapi: 3.0.0
+info:
+  title: API de Contas a Pagar
+  version: 1.0.0
+  description: Documentação da API para contas, categorias e formas de pagamento
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /api/bills:
+    get:
+      summary: Lista todas as contas
+      tags: [Bills]
+      responses:
+        200:
+          description: Lista retornada com sucesso
+    post:
+      summary: Cria uma nova conta
+      tags: [Bills]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bill'
+      responses:
+        201:
+          description: Conta criada com sucesso
+
+  /api/bills/{id}:
+    get:
+      summary: Retorna uma conta específica
+      tags: [Bills]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Conta encontrada
+        404:
+          description: Conta não encontrada
+    put:
+      summary: Atualiza uma conta
+      tags: [Bills]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bill'
+      responses:
+        200:
+          description: Conta atualizada
+    delete:
+      summary: Deleta uma conta
+      tags: [Bills]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Conta deletada
+
+  /api/category:
+    get:
+      summary: Lista todas as categorias
+      tags: [Category]
+      responses:
+        200:
+          description: Lista de categorias
+    post:
+      summary: Cria uma nova categoria
+      tags: [Category]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        201:
+          description: Categoria criada
+
+  /api/category/{id}:
+    delete:
+      summary: Deleta uma categoria
+      tags: [Category]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Categoria deletada
+
+  /api/payment-form:
+    get:
+      summary: Lista todas as formas de pagamento
+      tags: [PaymentForm]
+      responses:
+        200:
+          description: Lista de formas de pagamento
+    post:
+      summary: Cria uma nova forma de pagamento
+      tags: [PaymentForm]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentMethod'
+      responses:
+        201:
+          description: Forma de pagamento criada
+
+  /api/payment-form/{id}:
+    delete:
+      summary: Deleta uma forma de pagamento
+      tags: [PaymentForm]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Forma de pagamento deletada
+
+components:
+  schemas:
+    Bill:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: number
+        installments:
+          type: number
+        installmentsPayed:
+          type: number
+        isRecurring:
+          type: boolean
+        nextPaymentDate:
+          type: string
+          format: date
+        description:
+          type: string
+        category:
+          type: string
+        paymentMethod:
+          type: string
+
+    Category:
+      type: object
+      properties:
+        name:
+          type: string
+
+    PaymentMethod:
+      type: object
+      properties:
+        name:
+          type: string

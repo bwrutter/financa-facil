@@ -1,6 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const BillsSchema = new mongoose.Schema({
+const BillsSchema = new mongoose.Schema(
+  {
     name: { type: String, required: true },
     value: { type: Number, required: true },
     installments: { type: Number, default: 1 },
@@ -15,14 +16,16 @@ const BillsSchema = new mongoose.Schema({
     description: { type: String },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
+      ref: "Category",
       required: true,
     },
     userId: {
       type: String,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
-  }, { timestamps: true });  
+  },
+  { timestamps: true }
+);
 
-export default mongoose.model('Bills', BillsSchema);
+export default mongoose.model("Bills", BillsSchema);

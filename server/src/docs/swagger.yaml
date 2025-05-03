@@ -22,7 +22,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Bill'
+              $ref: "#/components/schemas/Bill"
       responses:
         201:
           description: Conta criada com sucesso
@@ -56,7 +56,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Bill'
+              $ref: "#/components/schemas/Bill"
       responses:
         200:
           description: Conta atualizada
@@ -88,7 +88,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: "#/components/schemas/Category"
       responses:
         201:
           description: Categoria criada
@@ -129,7 +129,7 @@ components:
           type: string
         category:
           type: string
-          
+
     Category:
       type: object
       properties:

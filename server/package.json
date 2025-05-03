@@ -7,7 +7,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "seed": "node src/config/seed.js"
+    "seed": "node src/config/seed.js",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -19,7 +22,10 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.0"
+    "@vitest/coverage-v8": "^3.1.2",
+    "nodemon": "^3.0.0",
+    "supertest": "^7.1.0",
+    "vitest": "^3.1.2"
   },
   "keywords": [
     "api",

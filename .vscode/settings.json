@@ -1,0 +1,11 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "eslint.enable": true,
+  "eslint.run": "onSave",
+  "eslint.options": {
+    "cache": true
+  },
+  "eslint.nodePath": "node_modules",
+  "prettier.prettierPath": "node_modules/prettier"
+}

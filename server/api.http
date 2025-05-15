@@ -1,0 +1,61 @@
+@token = xxxxxx
+
+GET http://localhost:5000/api/bills
+Authorization: Bearer {{token}}
+
+### Listar todas as contas
+GET http://localhost:5000/api/bills
+Authorization: Bearer {{token}}
+
+### Criar uma conta nova
+POST http://localhost:5000/api/bills
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Conta de luz",
+  "value": 150,
+  "installments": 1,
+  "installmentsPayed": 0,
+  "isRecurring": true,
+  "nextPaymentDate": "2025-06-10",
+  "description": "Conta mensal de luz",
+  "category": "ID_DA_CATEGORIA"
+}
+
+### Atualizar uma conta
+PUT http://localhost:5000/api/bills/{id}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Conta de luz atualizada",
+  "value": 180,
+  "installments": 1,
+  "installmentsPayed": 0,
+  "isRecurring": true,
+  "nextPaymentDate": "2025-06-15",
+  "description": "Conta mensal de luz atualizada",
+  "category": "ID_DA_CATEGORIA"
+}
+
+### Deletar uma conta
+DELETE http://localhost:5000/api/bills/{id}
+Authorization: Bearer {{token}}
+
+### Listar categorias do usuário
+GET http://localhost:5000/api/category
+Authorization: Bearer {{token}}
+
+### Criar categoria nova
+POST http://localhost:5000/api/category
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Alimentação"
+}
+
+### Deletar categoria
+DELETE http://localhost:5000/api/category/{id}
+Authorization: Bearer {{token}}

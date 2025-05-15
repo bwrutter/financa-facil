@@ -7,7 +7,11 @@ import {
   updateCategory,
 } from "../controllers/categoryController.js";
 
+import { authenticateUser } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
+
+router.use(authenticateUser);
 
 router.post("/", createCategory);
 router.get("/", getCategory);

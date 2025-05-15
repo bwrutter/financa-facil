@@ -22,6 +22,7 @@ const createBills = async (req, res) => {
       nextPaymentDate,
       description,
       category,
+      userId: req.user.uid,
     });
 
     await bills.save();
@@ -35,29 +36,23 @@ const createBills = async (req, res) => {
 
 const getBills = async (req, res) => {
   try {
-    const bills = await Bills.find().populate("category");
-
+    const bills = await Bills.find({ userId: req.user.uid }).populate("category");
     res.json(bills);
   } catch (error) {
     console.error("Erro ao buscar contas:", error.message);
-
-    if (error.name === "StrictPopulateError") {
-      return res.status(400).json({ error: `${error.message}` });
-    }
-
     res.status(500).json({ error: "Erro interno no servidor" });
   }
 };
 
 const getBillById = async (req, res) => {
   try {
-    const bills = await Bills.findById(req.params.id).populate("category");
+    const bill = await Bills.findOne({ _id: req.params.id, userId: req.user.uid }).populate("category");
 
-    if (!bills) {
+    if (!bill) {
       return res.status(404).json({ error: "Bill not found" });
     }
 
-    res.json(bills);
+    res.json(bill);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -78,8 +73,8 @@ const updateBill = async (req, res) => {
       category,
     } = req.body;
 
-    const updatedBill = await Bills.findByIdAndUpdate(
-      id,
+    const updatedBill = await Bills.findOneAndUpdate(
+      { _id: id, userId: req.user.uid },
       {
         name,
         value,
@@ -94,7 +89,7 @@ const updateBill = async (req, res) => {
     );
 
     if (!updatedBill) {
-      return res.status(404).json({ error: "Bill not found" });
+      return res.status(404).json({ error: "Bill not found or unauthorized" });
     }
 
     res.json({ message: "Bill updated successfully", updatedBill });
@@ -106,8 +101,12 @@ const updateBill = async (req, res) => {
 
 const deleteBill = async (req, res) => {
   try {
-    const { id } = req.params;
-    await Bills.findByIdAndDelete(id);
+    const deleted = await Bills.findOneAndDelete({ _id: req.params.id, userId: req.user.uid });
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Bill not found or unauthorized" });
+    }
+
     res.json({ message: "Bill deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });

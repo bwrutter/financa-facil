@@ -7,9 +7,9 @@ await dbConnect();
 
 const runSeed = async () => {
   try {
-    // Deleta se precisar
+    // Limpa dados antigos, descomente se quiser resetar a base antes do seed
     // await Category.deleteMany();
-    // await Bill.deleteMany();
+    // await Bills.deleteMany();
 
     const firebaseUid = "123456";
 
@@ -19,8 +19,8 @@ const runSeed = async () => {
       { name: "Transporte", userId: firebaseUid },
     ]);
 
-    console.log("Categories:");
-    console.log(categories.map((c) => ({ name: c.name, _id: c._id })));
+    console.log("Categories inserted:");
+    console.table(categories.map(({ name, _id }) => ({ name, _id })));
 
     const contas = await Bills.insertMany([
       {
@@ -29,7 +29,7 @@ const runSeed = async () => {
         installments: 0,
         installmentsPayed: 0,
         isRecurring: true,
-        nextPaymentDate: "2025-04-19",
+        nextPaymentDate: new Date("2025-04-19"),
         description: "Teste",
         category: categories[0]._id,
         userId: firebaseUid,
@@ -40,7 +40,7 @@ const runSeed = async () => {
         installments: 1,
         installmentsPayed: 0,
         isRecurring: false,
-        nextPaymentDate: "2025-04-25",
+        nextPaymentDate: new Date("2025-04-25"),
         description: "Texas Burger",
         category: categories[1]._id,
         userId: firebaseUid,
@@ -51,26 +51,26 @@ const runSeed = async () => {
         installments: 0,
         installmentsPayed: 0,
         isRecurring: true,
-        nextPaymentDate: "2025-04-19",
+        nextPaymentDate: new Date("2025-04-19"),
         description: "Uber para o trabalho",
         category: categories[2]._id,
         userId: firebaseUid,
       },
     ]);
 
-    console.log("\nContas (Bills):");
-    console.log(
-      contas.map((bill) => ({
-        name: bill.name,
-        _id: bill._id,
-        category: bill.category,
+    console.log("\nBills inserted:");
+    console.table(
+      contas.map(({ name, _id, category }) => ({
+        name,
+        _id,
+        category: category.toString(),
       }))
     );
 
-    console.log("\n Dados inseridos com sucesso!");
+    console.log("\nSeed completed successfully!");
     process.exit(0);
   } catch (error) {
-    console.error("Erro ao rodar seed:", error);
+    console.error("Error running seed:", error);
     process.exit(1);
   }
 };

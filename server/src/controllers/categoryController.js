@@ -2,68 +2,75 @@ import Category from "../models/Category.js";
 
 const createCategory = async (req, res) => {
   try {
-    const { name, userId } = req.body;
-    const category = new Category({ name, userId });
+    const { name } = req.body;
+    const category = new Category({ name, userId: req.user.uid });
     await category.save();
-    res.status(201).json({ message: "category criada com sucesso", category });
+    res.status(201).json({ message: "Category criada com sucesso", category });
   } catch (error) {
-    res.status(500).json({ error: "Erro ao criar category" });
+    res.status(500).json({ error: "Erro ao criar categoria" });
   }
 };
 
 const getCategory = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const categories = await Category.find({ userId: req.user.uid });
     res.json(categories);
   } catch (error) {
-    console.error("Erro ao buscar categories:", error.message);
-    res.status(500).json({ error: "Erro ao buscar categories" });
+    res.status(500).json({ error: "Erro ao buscar categorias" });
   }
 };
 
 const getCategoryById = async (req, res) => {
   try {
-    const categories = await Category.findById(req.params.id);
+    const category = await Category.findOne({
+      _id: req.params.id,
+      userId: req.user.uid,
+    });
 
-    if (!categories) {
-      return res.status(404).json({ error: "categories not found" });
+    if (!category) {
+      return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
-    res.json(categories);
+    res.json(category);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Erro interno no servidor" });
   }
 };
 
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, userId } = req.body;
+    const { name } = req.body;
 
-    const updatedCategory = await Category.findByIdAndUpdate(id, {
-      name,
-      userId,
-    });
-
-    if (!updatedCategory) {
-      return res.status(404).json({ error: "Category not found" });
+    const category = await Category.findOne({ _id: id, userId: req.user.uid });
+    if (!category) {
+      return res.status(403).json({ error: "Acesso negado ou categoria não encontrada" });
     }
 
-    res.json({ message: "Category updated successfully", updatedCategory });
+    category.name = name;
+    await category.save();
+
+    res.json({ message: "Categoria atualizada", category });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Erro ao atualizar categoria" });
   }
 };
 
 const deleteCategory = async (req, res) => {
   try {
-    const { id } = req.params;
-    await Category.findByIdAndDelete(id);
-    res.json({ message: "Category deleted successfully" });
+    const deleted = await Category.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.uid,
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Categoria não encontrada ou não autorizada" });
+    }
+
+    res.json({ message: "Categoria deletada com sucesso" });
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Erro interno no servidor" });
   }
 };
 

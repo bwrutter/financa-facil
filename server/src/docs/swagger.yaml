@@ -9,14 +9,18 @@ servers:
 paths:
   /api/bills:
     get:
-      summary: Lista todas as contas
+      summary: Lista todas as contas do usuário autenticado
       tags: [Bills]
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: Lista retornada com sucesso
     post:
       summary: Cria uma nova conta
       tags: [Bills]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -29,8 +33,10 @@ paths:
 
   /api/bills/{id}:
     get:
-      summary: Retorna uma conta específica
+      summary: Retorna uma conta específica do usuário
       tags: [Bills]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -43,8 +49,10 @@ paths:
         404:
           description: Conta não encontrada
     put:
-      summary: Atualiza uma conta
+      summary: Atualiza uma conta do usuário
       tags: [Bills]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -61,8 +69,10 @@ paths:
         200:
           description: Conta atualizada
     delete:
-      summary: Deleta uma conta
+      summary: Deleta uma conta do usuário
       tags: [Bills]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -75,14 +85,18 @@ paths:
 
   /api/category:
     get:
-      summary: Lista todas as categorias
+      summary: Lista todas as categorias do usuário
       tags: [Category]
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: Lista de categorias
     post:
       summary: Cria uma nova categoria
       tags: [Category]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -94,23 +108,72 @@ paths:
           description: Categoria criada
 
   /api/category/{id}:
-    delete:
-      summary: Deleta uma categoria
+    get:
+      summary: Retorna uma categoria específica
       tags: [Category]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
+          required: true
           schema:
             type: string
+      responses:
+        200:
+          description: Categoria encontrada
+        404:
+          description: Categoria não encontrada
+    put:
+      summary: Atualiza uma categoria
+      tags: [Category]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
           required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+      responses:
+        200:
+          description: Categoria atualizada
+    delete:
+      summary: Deleta uma categoria
+      tags: [Category]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: Categoria deletada
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Bill:
       type: object
+      required:
+        - name
+        - value
+        - category
+        - userId
       properties:
         name:
           type: string
@@ -129,9 +192,16 @@ components:
           type: string
         category:
           type: string
+        userId:
+          type: string
 
     Category:
       type: object
+      required:
+        - name
+        - userId
       properties:
         name:
+          type: string
+        userId:
           type: string

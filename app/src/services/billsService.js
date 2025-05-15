@@ -1,28 +1,41 @@
 import axios from 'axios';
+import { auth } from '../firebase/config'
 
-const API_URL = 'http://localhost:5000/bills';
+const API_URL = 'http://localhost:5000/api/bills';
+
+const getAuthHeader = async () => {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Usuário não autenticado");
+  const token = await user.getIdToken();
+  return { Authorization: `Bearer ${token}` };
+};
 
 export const getBills = async () => {
-  const response = await axios.get(API_URL);
+  const headers = await getAuthHeader();
+  const response = await axios.get(API_URL, { headers });
   return response.data;
 };
 
 export const getBillById = async (id) => {
-  const response = await axios.get(`${API_URL}/${id}`);
+  const headers = await getAuthHeader();
+  const response = await axios.get(`${API_URL}/${id}`, { headers });
   return response.data;
 };
 
 export const createBill = async (billData) => {
-  const response = await axios.post(API_URL, billData);
+  const headers = await getAuthHeader();
+  const response = await axios.post(API_URL, billData, { headers });
   return response.data;
 };
 
 export const updateBill = async (id, updatedData) => {
-  const response = await axios.put(`${API_URL}/${id}`, updatedData);
+  const headers = await getAuthHeader();
+  const response = await axios.put(`${API_URL}/${id}`, updatedData, { headers });
   return response.data;
 };
 
 export const deleteBill = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`);
+  const headers = await getAuthHeader();
+  const response = await axios.delete(`${API_URL}/${id}`, { headers });
   return response.data;
 };

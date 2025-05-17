@@ -6,24 +6,32 @@ import Contas from './pages/Contas';
 import Graficos from './pages/Graficos';
 import ProtectedRoute from './components/ProtectedRoute';
 
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#9c27b0',
+    },
+  },
+  typography: {
+  },
+});
+
 const App = () => {
   return (
-    <div data-theme="light">
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <AuthProvider>
-        <BrowserRouter
-          future={{ //TODO: Revisar isso posteriormente
-            v7_relativeSplatPath: true,
-            v7_startTransition: true,
-            v7_fetcherPersist: true,
-            v7_normalizeFormMethod: true,
-            v7_partialHydration: true,
-            v7_skipActionErrorRevalidation: true,
-          }}
-        >
+        <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route 
-              path="/" 
+            <Route
+              path="/"
               element={
                 <ProtectedRoute>
                   <MainLayout />
@@ -37,7 +45,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       </AuthProvider>
-    </div>
+    </ThemeProvider>
   );
 };
 

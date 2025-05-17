@@ -1,72 +1,159 @@
 import { useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  CssBaseline,
+  Box,
+  Button,
+  Divider,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import LogoutIcon from '@mui/icons-material/Logout';
+
+const drawerWidth = 240;
 
 const MainLayout = () => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { logout } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const menuItems = [
+    { text: 'Cadastro de Contas', to: '/contas', icon: <AccountBalanceIcon /> },
+    { text: 'Gráficos', to: '/graficos', icon: <BarChartIcon /> },
+  ];
+
+  const drawer = (
+    <div>
+      <Toolbar>
+        <Typography variant="h6" noWrap component="div">
+          Finança Fácil
+        </Typography>
+      </Toolbar>
+      <Divider />
+      <List>
+        {menuItems.map(({ text, to, icon }) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton
+              component={Link}
+              to={to}
+              selected={location.pathname === to}
+              onClick={() => isMobile && setMobileOpen(false)}
+            >
+              <ListItemIcon>{icon}</ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Box sx={{ flexGrow: 1 }} />
+      <Divider />
+      <Box sx={{ p: 2 }}>
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<LogoutIcon />}
+          fullWidth
+          onClick={logout}
+        >
+          Sair
+        </Button>
+      </Box>
+    </div>
+  );
 
   return (
-    <div className="drawer lg:drawer-open">
-      <input 
-        id="drawer" 
-        type="checkbox" 
-        className="drawer-toggle" 
-        checked={isDrawerOpen}
-        onChange={() => setIsDrawerOpen(!isDrawerOpen)}
-      />
-      
-      <div className="drawer-content">
-        <div className="navbar bg-base-100 lg:hidden">
-          <div className="flex-none">
-            <label 
-              htmlFor="drawer" 
-              className="btn btn-square btn-ghost"
-              onClick={() => setIsDrawerOpen(true)}
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { lg: `calc(100% - ${drawerWidth}px)` },
+          ml: { lg: `${drawerWidth}px` },
+        }}
+      >
+        <Toolbar>
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              aria-label="abrir menu"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { lg: 'none' } }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-              </svg>
-            </label>
-          </div>
-          <div className="flex-1">
-            <a className="btn btn-ghost text-xl">Finança Fácil</a>
-          </div>
-        </div>
-        
-        <div className="p-4">
-          <Outlet />
-        </div>
-      </div>
-      
-      <div className="drawer-side">
-        <label 
-          htmlFor="drawer" 
-          className="drawer-overlay"
-          onClick={() => setIsDrawerOpen(false)}
-        ></label>
-        <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-          <li className="mb-4">
-            <a className="btn btn-ghost text-xl">Finança Fácil</a>
-          </li>
-          <li>
-            <Link to="/contas">Cadastro de Contas</Link>
-          </li>
-          <li>
-            <Link to="/graficos">Gráficos</Link>
-          </li>
-          <li className="mt-auto">
-            <button 
-              className="btn btn-error"
-              onClick={logout}
-            >
-              Sair
-            </button>
-          </li>
-        </ul>
-      </div>
-    </div>
+              <MenuIcon />
+            </IconButton>
+          )}
+          <Typography variant="h6" noWrap component="div">
+            Finança Fácil
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      <Box
+        component="nav"
+        sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 0 } }}
+        aria-label="navegação principal"
+      >
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            display: { xs: 'block', lg: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+        >
+          {drawer}
+        </Drawer>
+
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', lg: 'block' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { lg: `calc(100% - ${drawerWidth}px)` },
+          mt: 8,
+        }}
+      >
+        <Outlet />
+      </Box>
+    </Box>
   );
 };
 
-export default MainLayout; 
+export default MainLayout;

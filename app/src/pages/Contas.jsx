@@ -1,10 +1,29 @@
 import { useEffect, useState } from 'react';
 import { createBill, getBills } from '../services/billsService';
 import { createCategory, getCategories } from '../services/categoryService';
+import Table from '../components/Table';
+
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+  TextField,
+  Alert,
+} from '@mui/material';
 
 const Contas = () => {
-  const [contas, setContas] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
 
   const [nome, setNome] = useState('');
   const [valor, setValor] = useState('');
@@ -14,17 +33,28 @@ const Contas = () => {
   const [novaCategoria, setNovaCategoria] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('');
 
-  // Estados para filtro de datas
-  const [dataDe, setDataDe] = useState('');
-  const [dataAte, setDataAte] = useState('');
+  const dateNow = new Date().toISOString().split('T')[0];
+  const [dataDe, setDataDe] = useState(dateNow);
+  const [dataAte, setDataAte] = useState(dateNow);
 
-  // Contas filtradas (após filtro de datas)
   const [contasFiltradas, setContasFiltradas] = useState([]);
+
+  // Estado do Toast
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastSeverity, setToastSeverity] = useState('info'); // info, success, warning, error
+
+  // Função para mostrar toast
+  const mostrarErro = (message, severity = 'info') => {
+    setToastMsg(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
 
   const carregarContas = async () => {
     try {
       const data = await getBills();
-      setContas(data);
+      setContasFiltradas(data);
     } catch (error) {
       console.error("Erro ao carregar contas:", error);
     }
@@ -40,27 +70,31 @@ const Contas = () => {
   };
 
   useEffect(() => {
-    carregarContas();
     carregarCategorias();
+    carregarContas();
   }, []);
 
-  // Filtra as contas toda vez que mudar contas ou o filtro de datas
-  useEffect(() => {
-    let filtradas = contas;
+  const buscarContasFiltradas = async () => {
+    try {
+      const todasContas = await getBills();
+      let filtradas = todasContas;
 
-    if (dataDe) {
-      filtradas = filtradas.filter(conta => conta.nextPaymentDate >= dataDe);
-    }
-    if (dataAte) {
-      filtradas = filtradas.filter(conta => conta.nextPaymentDate <= dataAte);
-    }
+      if (dataDe) {
+        filtradas = filtradas.filter(conta => conta.nextPaymentDate >= dataDe);
+      }
+      if (dataAte) {
+        filtradas = filtradas.filter(conta => conta.nextPaymentDate <= dataAte);
+      }
 
-    setContasFiltradas(filtradas);
-  }, [contas, dataDe, dataAte]);
+      setContasFiltradas(filtradas);
+    } catch (error) {
+      console.error("Erro ao buscar contas:", error);
+    }
+  };
 
   const salvarConta = async () => {
     if (!nome || !valor || !nextPaymentDate || !categoriaSelecionada) {
-      alert('Preencha todos os campos obrigatórios.');
+      mostrarErro("Preencha os campos obrigatórios!", "error");
       return;
     }
 
@@ -78,10 +112,12 @@ const Contas = () => {
     try {
       await createBill(novaConta);
       await carregarContas();
-      document.getElementById('modal_criar_tipo_conta').close();
+      setMostrarModal(false);
       resetarFormulario();
+      mostrarErro('Conta cadastrada com sucesso!', 'success');
     } catch (error) {
       console.error("Erro ao criar conta:", error);
+      mostrarErro('Erro ao criar conta.', 'error');
     }
   };
 
@@ -96,7 +132,7 @@ const Contas = () => {
 
   const criarNovaCategoria = async () => {
     if (!novaCategoria.trim()) {
-      alert('Informe o nome da categoria.');
+      mostrarErro('Informe o nome da categoria.', 'warning');
       return;
     }
 
@@ -104,169 +140,158 @@ const Contas = () => {
       await createCategory({ name: novaCategoria });
       await carregarCategorias();
       setNovaCategoria('');
+      mostrarErro('Categoria criada com sucesso!', 'success');
     } catch (error) {
       console.error("Erro ao criar categoria:", error);
+      mostrarErro('Erro ao criar categoria.', 'error');
     }
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Cadastro de Contas</h1>
-
-      {/* Filtros de Data */}
-      <div className="flex gap-4 mb-4 items-end">
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">Data De</span>
-          </label>
-          <input
-            type="date"
-            className="input input-bordered"
-            value={dataDe}
-            onChange={(e) => setDataDe(e.target.value)}
-          />
-        </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">Data Até</span>
-          </label>
-          <input
-            type="date"
-            className="input input-bordered"
-            value={dataAte}
-            onChange={(e) => setDataAte(e.target.value)}
-          />
-        </div>
-
-        <button
-          className="btn btn-secondary"
+    <Box p={4}>
+      <Box mb={4} display="flex" gap={2} alignItems="flex-end">
+        <TextField
+          label="Data De"
+          type="date"
+          value={dataDe}
+          onChange={(e) => setDataDe(e.target.value)}
+        />
+        <TextField
+          label="Data Até"
+          type="date"
+          value={dataAte}
+          onChange={(e) => setDataAte(e.target.value)}
+        />
+        <Button variant="contained" onClick={buscarContasFiltradas}>
+          Buscar
+        </Button>
+        <Button
+          variant="outlined"
           onClick={() => {
-            setDataDe('');
-            setDataAte('');
+            setDataDe(dateNow);
+            setDataAte(dateNow);
+            setContasFiltradas([]);
           }}
         >
           Limpar filtro
-        </button>
-        <button className="btn btn-primary" onClick={() => document.getElementById('modal_criar_tipo_conta').showModal()}>
+        </Button>
+        <Button variant="contained" color="primary" onClick={() => setMostrarModal(true)}>
           Cadastrar conta
-        </button>
-      </div>
-      <dialog id="modal_criar_tipo_conta" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Cadastrar conta</h3>
+        </Button>
+      </Box>
 
-          <div className="form-control mt-4">
-            <legend>Nome da Conta</legend>
-            <input
-              type="text"
+      <Dialog open={mostrarModal} onClose={() => setMostrarModal(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Cadastrar conta</DialogTitle>
+        <DialogContent dividers>
+          <Box display="flex" flexDirection="column" gap={2} mt={1}>
+            <TextField
+              label="Nome da Conta"
               placeholder="Ex: Netflix"
-              className="input input-bordered"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
+              fullWidth
             />
-          </div>
-          <div className="form-control mt-2">
-            <legend>Valor</legend>
-            <input
+            <TextField
+              label="Valor"
               type="number"
               placeholder="10.99"
-              className="input input-bordered"
               value={valor}
               onChange={(e) => setValor(e.target.value)}
+              fullWidth
             />
-          </div>
-          <div className="form-control mt-2">
-            <legend>Descrição</legend>
-            <input
-              type="text"
+            <TextField
+              label="Descrição"
               placeholder="Ex: Streaming"
-              className="input input-bordered"
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
+              fullWidth
             />
-          </div>
-          <div className="form-control mt-2">
-            <legend>Data da Primeira Parcela</legend>
-            <input
+            <TextField
+              label="Data da Primeira Parcela"
               type="date"
-              className="input input-bordered"
               value={nextPaymentDate}
               onChange={(e) => setNextPaymentDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
             />
-          </div>
-          <fieldset className="flex items-center gap-2 p-4 bg-base-100 rounded-box w-fit">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={recorrente}
-              onChange={(e) => setRecorrente(e.target.checked)}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={recorrente}
+                  onChange={(e) => setRecorrente(e.target.checked)}
+                />
+              }
+              label="Recorrente?"
             />
-            <label className="label-text">Recorrente?</label>
-          </fieldset>
+            <FormControl fullWidth>
+              <InputLabel id="categoria-label">Categoria</InputLabel>
+              <Select
+                labelId="categoria-label"
+                value={categoriaSelecionada}
+                label="Categoria"
+                onChange={(e) => setCategoriaSelecionada(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Selecione uma categoria</em>
+                </MenuItem>
+                {categorias.map((cat) => (
+                  <MenuItem key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-          <div className="form-control mt-2">
-            <legend>Categoria</legend>
-            <select
-              className="select select-bordered"
-              value={categoriaSelecionada}
-              onChange={(e) => setCategoriaSelecionada(e.target.value)}
-            >
-              <option value="">Selecione uma categoria</option>
-              {categorias.map((cat) => (
-                <option key={cat._id} value={cat._id}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
+            <Box mt={2}>
+              <TextField
+                label="Nova Categoria"
+                placeholder="Ex: Lazer"
+                value={novaCategoria}
+                onChange={(e) => setNovaCategoria(e.target.value)}
+                fullWidth
+              />
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={criarNovaCategoria}
+                sx={{ mt: 1 }}
+              >
+                Criar nova categoria
+              </Button>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={salvarConta} variant="contained" color="primary">
+            Salvar
+          </Button>
+          <Button onClick={() => setMostrarModal(false)} variant="outlined">
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-          <div className="form-control mt-4">
-            <legend>Nova Categoria</legend>
-            <input
-              type="text"
-              placeholder="Ex: Lazer"
-              className="input input-bordered"
-              value={novaCategoria}
-              onChange={(e) => setNovaCategoria(e.target.value)}
-            />
-            <button className="btn btn-secondary mt-2" onClick={criarNovaCategoria}>Criar nova categoria</button>
-          </div>
+      <Table
+        contas={contasFiltradas}
+        onEditar={(conta) => console.log('Editar:', conta)}
+        onExcluir={(conta) => console.log('Excluir:', conta)}
+      />
 
-          <div className="modal-action">
-            <form method="dialog">
-              <button type="button" className="btn mr-3" onClick={salvarConta}>Salvar</button>
-              <button className="btn">Fechar</button>
-            </form>
-          </div>
-        </div>
-      </dialog>
-
-      <div className="overflow-x-auto mt-8">
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Valor</th>
-              <th>Categoria</th>
-              <th>Data Próx. Pagamento</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {contasFiltradas.map((conta) => (
-              <tr key={conta._id}>
-                <td>{conta.name}</td>
-                <td>R$ {conta.value.toFixed(2)}</td>
-                <td>{conta.category?.name || 'Sem categoria'}</td>
-                <td>{conta.nextPaymentDate}</td>
-                <td>
-                  <button className="btn btn-ghost btn-xs">Editar</button>
-                  <button className="btn btn-ghost btn-xs text-error">Excluir</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={3000}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setToastOpen(false)}
+          severity={toastSeverity}
+          sx={{ width: '100%' }}
+        >
+          {toastMsg}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 

@@ -40,5 +40,5 @@ jobs:
             --region southamerica-east1 \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars FIREBASE_SERVICE_ACCOUNT="${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+            --set-env-vars "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
         

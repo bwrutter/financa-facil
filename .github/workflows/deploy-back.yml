@@ -22,6 +22,7 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Build & Push Docker image
+        working-directory: ./server
         run: |
           IMAGE="gcr.io/${{ secrets.GCP_PROJECT_ID }}/financa-facil-backend"
           docker build -t $IMAGE ./server

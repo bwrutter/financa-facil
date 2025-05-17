@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { auth } from '../firebase/config';
 
-const API_URL = process.env.VITE_APP_API_URL || 'http://localhost:5000/api/category';
+const API_URL = process.env.VITE_API_URL || 'http://localhost:5000/api/category';
 
 const getAuthHeader = async () => {
   const user = auth.currentUser;

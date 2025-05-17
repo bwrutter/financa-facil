@@ -19,7 +19,7 @@ jobs:
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Deploy to App Engine
         working-directory: ./server

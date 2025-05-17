@@ -1,4 +1,4 @@
-name: Deploy Backend to App Engine
+name: Deploy Backend
 
 on:
   workflow_dispatch:
@@ -21,6 +21,6 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Deploy to App Engine
+      - name: Deploy
         working-directory: ./server
         run: gcloud app deploy app.yaml --quiet

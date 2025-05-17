@@ -1,9 +1,10 @@
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import firebaseAdminConfig from './firebase-adminsdk.json' with { type: 'json' };
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 initializeApp({
-  credential: cert(firebaseAdminConfig),
+  credential: cert(serviceAccount),
 });
 
 export { getAuth };

@@ -1,7 +1,7 @@
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+const serviceAccount = JSON.parse(process.env.GCP_SA_KEY);
 
 initializeApp({
   credential: cert(serviceAccount),

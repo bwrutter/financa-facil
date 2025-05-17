@@ -21,11 +21,15 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+      - name: Configure Docker for GCR
+        run: |
+          gcloud auth configure-docker --quiet
+
       - name: Build & Push Docker image
         working-directory: ./server
         run: |
           IMAGE="gcr.io/${{ secrets.GCP_PROJECT_ID }}/financa-facil-backend"
-          docker build -t $IMAGE .      # usa o diretório atual como contexto
+          docker build -t $IMAGE .
           docker push $IMAGE
 
       - name: Deploy to Cloud Run

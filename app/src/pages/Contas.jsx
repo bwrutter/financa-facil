@@ -39,12 +39,10 @@ const Contas = () => {
 
   const [contasFiltradas, setContasFiltradas] = useState([]);
 
-  // Estado do Toast
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
-  const [toastSeverity, setToastSeverity] = useState('info'); // info, success, warning, error
+  const [toastSeverity, setToastSeverity] = useState('info');
 
-  // Função para mostrar toast
   const mostrarErro = (message, severity = 'info') => {
     setToastMsg(message);
     setToastSeverity(severity);
@@ -71,7 +69,6 @@ const Contas = () => {
 
   useEffect(() => {
     carregarCategorias();
-    carregarContas();
   }, []);
 
   const buscarContasFiltradas = async () => {

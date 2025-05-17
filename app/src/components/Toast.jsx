@@ -21,7 +21,6 @@ const Toast = ({ message, type = "info", visible }) => {
     <div className="toast toast-bottom toast-center">
       <div
         className={`alert ${typeClass[type]} shadow-lg px-6 py-4 rounded-xl text-lg flex items-center gap-4 animate-fadeIn`}
-        style={{ minWidth: "300px" }}
       >
         {icons[type]}
         <span>{message}</span>

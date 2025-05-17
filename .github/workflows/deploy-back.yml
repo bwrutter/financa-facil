@@ -1,4 +1,4 @@
-name: Deploy Backend to App Engine
+name: Deploy Backend
 
 on:
   workflow_dispatch:

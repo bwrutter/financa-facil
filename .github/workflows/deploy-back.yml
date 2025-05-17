@@ -25,7 +25,7 @@ jobs:
         working-directory: ./server
         run: |
           IMAGE="gcr.io/${{ secrets.GCP_PROJECT_ID }}/financa-facil-backend"
-          docker build -t $IMAGE
+          docker build -t $IMAGE .      # usa o diretório atual como contexto
           docker push $IMAGE
 
       - name: Deploy to Cloud Run

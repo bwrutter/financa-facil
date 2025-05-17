@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { auth } from '../firebase/config'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/bills';
+const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = `${baseUrl}/api/bills`;
 
 const getAuthHeader = async () => {
   const user = auth.currentUser;

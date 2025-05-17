@@ -6,9 +6,20 @@ import billsRoutes from "./routes/billsRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import setupSwagger from "./config/swaggerConfig.js";
 
+const allowedOrigins = [ //TODO: Ajustar
+  'https://financa-facil-6ff1e.firebaseapp.com',
+  'http://localhost:5173'
+];
+
 const app = express();
+app.options('*', cors());
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 dbConnect();
 

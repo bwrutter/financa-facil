@@ -64,16 +64,6 @@ FIREBASE_SERVICE_ACCOUNT_BASE64=xxxx
 
 ---
 
-### 4. Populando o banco com dados de exemplo (opcional)
-
-Você pode rodar um comando (na raiz do projeto, ou direto no back) para inserir alguns registros iniciais no banco:
-
-```bash
-npm run seed
-```
-
----
-
 ## 📌 Observações
 
 - O projeto ainda está em desenvolvimento. Algumas funcionalidades podem não estar disponíveis ou estáveis.
@@ -84,7 +74,7 @@ npm run seed
 
 ## ✨ Contribuições
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests.
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues, pull requests ou trocar uma idéia comigo.
 
 ---
 

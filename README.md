@@ -53,8 +53,11 @@ VITE_FIREBASE_APP_ID=xxxxxxxxxxxx
 Crie um arquivo `.env` dentro da pasta `server/` com as variáveis de ambiente necessárias para conectar ao MongoDB. Exemplo:
 
 ```env
-MONGO_URI=xxxxxxxxxxxxxxxxxxxxxxxxxx
-PORT=5000
+MONGO_URI=xxxx
+FIREBASE_PROJECT_ID=xxxx
+FIREBASE_CLIENT_EMAIL=xxxx
+FIREBASE_PRIVATE_KEY=xxxx
+FIREBASE_SERVICE_ACCOUNT_BASE64=xxxx
 ```
 
 > 💡 Recomenda-se utilizar o [MongoDB Atlas](https://www.mongodb.com/atlas) para facilitar o acesso ao banco de dados.

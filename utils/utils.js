@@ -1,3 +1,11 @@
+const formatDate = (dataISO) => {
+  const data = new Date(dataISO);
+  const dia = String(data.getUTCDate()).padStart(2, '0');
+  const mes = String(data.getUTCMonth() + 1).padStart(2, '0');
+  const ano = data.getUTCFullYear();
+  return `${dia}/${mes}/${ano}`;
+};
+
 const isValidCPF = (cpf) => {
   cpf = cpf.replace(/[^\d]+/g, "");
 
@@ -83,4 +91,4 @@ const isValidCNPJ = (cnpj) => {
   return true;
 };
 
-export { isValidCPF, isValidCNPJ };
+export { isValidCPF, isValidCNPJ, formatDate };

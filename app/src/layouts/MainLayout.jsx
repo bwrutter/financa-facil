@@ -38,7 +38,7 @@ const MainLayout = () => {
   };
 
   const menuItems = [
-    { text: 'Cadastro de Contas', to: '/contas', icon: <AccountBalanceIcon /> },
+    { text: 'Contas a pagar', to: '/contas', icon: <AccountBalanceIcon /> },
     { text: 'Gráficos', to: '/graficos', icon: <BarChartIcon /> },
   ];
 

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { formatDate } from '@shared/utils';
 
 const Table = ({ contas, onEditar, onExcluir }) => {
   return (
@@ -48,7 +49,7 @@ const Table = ({ contas, onEditar, onExcluir }) => {
                   <Chip label="Sem categoria" color="default" size="small" />
                 )}
               </TableCell>
-              <TableCell>{conta.nextPaymentDate}</TableCell>
+              <TableCell>{formatDate(conta.nextPaymentDate)}</TableCell>
               <TableCell>
                 <Tooltip title="Editar">
                   <IconButton color="primary" onClick={() => onEditar(conta)}>

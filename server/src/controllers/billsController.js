@@ -1,27 +1,27 @@
+import 'express-async-errors';
 import Bills from "../models/Bills.js";
+import Joi from 'joi';
 
-const createBills = async (req, res) => {
+const billSchema = Joi.object({
+  name: Joi.string().trim().min(1).required(),
+  value: Joi.number().positive().required(),
+  installments: Joi.number().integer().min(1).optional().default(1),
+  installmentsPayed: Joi.number().integer().min(0).optional().default(0),
+  isRecurring: Joi.boolean().optional().default(false),
+  nextPaymentDate: Joi.date().iso().optional().allow(null),
+  description: Joi.string().trim().optional().allow(''),
+  category: Joi.string().hex().length(24).optional(),
+});
+
+const createBills = async (req, res, next) => {
   try {
-    const {
-      name,
-      value,
-      installments,
-      installmentsPayed,
-      isRecurring,
-      nextPaymentDate,
-      description,
-      category,
-    } = req.body;
+    const { error, value } = billSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
 
     const bills = new Bills({
-      name,
-      value,
-      installments,
-      installmentsPayed,
-      isRecurring,
-      nextPaymentDate,
-      description,
-      category,
+      ...value,
       userId: req.user.uid,
     });
 
@@ -29,22 +29,20 @@ const createBills = async (req, res) => {
 
     res.status(201).json({ message: "Bill created successfully", bills });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-const getBills = async (req, res) => {
+const getBills = async (req, res, next) => {
   try {
     const bills = await Bills.find({ userId: req.user.uid }).populate("category");
     res.json(bills);
   } catch (error) {
-    console.error("Erro ao buscar contas:", error.message);
-    res.status(500).json({ error: "Erro interno no servidor" });
+    next(error);
   }
 };
 
-const getBillById = async (req, res) => {
+const getBillById = async (req, res, next) => {
   try {
     const bill = await Bills.findOne({ _id: req.params.id, userId: req.user.uid }).populate("category");
 
@@ -54,37 +52,21 @@ const getBillById = async (req, res) => {
 
     res.json(bill);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-const updateBill = async (req, res) => {
+const updateBill = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const {
-      name,
-      value,
-      installments,
-      installmentsPayed,
-      isRecurring,
-      nextPaymentDate,
-      description,
-      category,
-    } = req.body;
+    const { error, value } = billSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
 
     const updatedBill = await Bills.findOneAndUpdate(
       { _id: id, userId: req.user.uid },
-      {
-        name,
-        value,
-        installments,
-        installmentsPayed,
-        isRecurring,
-        nextPaymentDate,
-        description,
-        category,
-      },
+      value,
       { new: true }
     );
 
@@ -94,12 +76,11 @@ const updateBill = async (req, res) => {
 
     res.json({ message: "Bill updated successfully", updatedBill });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-const deleteBill = async (req, res) => {
+const deleteBill = async (req, res, next) => {
   try {
     const deleted = await Bills.findOneAndDelete({ _id: req.params.id, userId: req.user.uid });
 
@@ -109,7 +90,7 @@ const deleteBill = async (req, res) => {
 
     res.json({ message: "Bill deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 

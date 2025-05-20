@@ -7,7 +7,7 @@ import {
   deleteBill,
 } from '../controllers/billsController.js';
 
-import { authenticateUser } from '../middleware/authMiddleware.js';
+import { authenticateUser } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

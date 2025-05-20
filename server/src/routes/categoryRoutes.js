@@ -7,7 +7,7 @@ import {
   updateCategory,
 } from "../controllers/categoryController.js";
 
-import { authenticateUser } from '../middleware/authMiddleware.js';
+import { authenticateUser } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

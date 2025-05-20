@@ -19,26 +19,23 @@ import {
   Snackbar,
   TextField,
   Alert,
+  Tooltip
 } from '@mui/material';
 
 const Contas = () => {
+  const dateNow = new Date().toISOString().split('T')[0];
   const [categorias, setCategorias] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
-
   const [nome, setNome] = useState('');
   const [valor, setValor] = useState('');
   const [descricao, setDescricao] = useState('');
-  const [nextPaymentDate, setNextPaymentDate] = useState('');
+  const [nextPaymentDate, setNextPaymentDate] = useState(dateNow);
   const [recorrente, setRecorrente] = useState(false);
   const [novaCategoria, setNovaCategoria] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('');
-
-  const dateNow = new Date().toISOString().split('T')[0];
   const [dataDe, setDataDe] = useState(dateNow);
   const [dataAte, setDataAte] = useState(dateNow);
-
   const [contasFiltradas, setContasFiltradas] = useState([]);
-
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastSeverity, setToastSeverity] = useState('info');
@@ -122,7 +119,7 @@ const Contas = () => {
     setNome('');
     setValor('');
     setDescricao('');
-    setNextPaymentDate('');
+    setNextPaymentDate(dateNow);
     setRecorrente(false);
     setCategoriaSelecionada('');
   };
@@ -211,15 +208,17 @@ const Contas = () => {
               InputLabelProps={{ shrink: true }}
               fullWidth
             />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={recorrente}
-                  onChange={(e) => setRecorrente(e.target.checked)}
-                />
-              }
-              label="Recorrente?"
-            />
+            <Tooltip title="Marque esta opção se a conta for recorrente (ex: aluguel, assinatura)">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={recorrente}
+                    onChange={(e) => setRecorrente(e.target.checked)}
+                  />
+                }
+                label="Recorrente?"
+              />
+            </Tooltip>
             <FormControl fullWidth>
               <InputLabel id="categoria-label">Categoria</InputLabel>
               <Select

@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -5,6 +6,7 @@ import dbConnect from "./config/db.js";
 import billsRoutes from "./routes/billsRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import setupSwagger from "./config/swaggerConfig.js";
+import errorHandler from './middlewares/errorHandler.js';
 
 const allowedOrigins = [ //TODO: Ajustar
   'https://financa-facil-6ff1e.firebaseapp.com',
@@ -32,5 +34,6 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
+app.use(errorHandler);
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

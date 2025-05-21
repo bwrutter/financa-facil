@@ -1,52 +1,60 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import MainLayout from './layouts/MainLayout';
+import React from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Sidebar from './components/Sidebar';
+import BillsPage from './pages/BillsPage';
+import ChartsPage from './pages/ChartsPage';
 import Login from './pages/Login';
-import Contas from './pages/Contas';
-import Graficos from './pages/Graficos';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import './index.css';
 
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+const Layout = ({ children }) => {
+  const { user } = useAuth();
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/login';
 
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#9c27b0',
-    },
-  },
-  typography: {
-  },
-});
-
-const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <MainLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/contas" replace />} />
-              <Route path="contas" element={<Contas />} />
-              <Route path="graficos" element={<Graficos />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <div className="flex h-screen bg-gray-50">
+      {!isLoginPage && user && <Sidebar />}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {children}
+      </div>
+    </div>
   );
 };
+
+function App() {
+  return (
+    <AuthProvider>
+      <Layout>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+
+          <Route path="/" element={<Navigate to="/bills" replace />} />
+
+          <Route
+            path="/bills"
+            element={
+              <ProtectedRoute>
+                <BillsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/charts"
+            element={
+              <ProtectedRoute>
+                <ChartsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Layout>
+    </AuthProvider>
+  );
+}
 
 export default App;

@@ -40,10 +40,3 @@ export const deleteBill = async (id) => {
   const response = await axios.delete(`${API_URL}/${id}`, { headers });
   return response.data;
 };
-
-export const filterBillsByDateRange = async (startDate, endDate) => {
-  await delay(500);
-  return mockBills.filter(bill => {
-    return bill.nextPayment >= startDate && bill.nextPayment <= endDate;
-  });
-};

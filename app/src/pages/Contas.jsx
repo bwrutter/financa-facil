@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { createBill, getBills } from '../services/billsService';
 import { createCategory, getCategories } from '../services/categoryService';
 import Table from '../components/Table';
-
+import FilterListIcon from '@mui/icons-material/FilterList';
 import {
   Box,
+  Card,
+  CardContent,
+  Typography,
   Button,
   Checkbox,
   Dialog,
@@ -36,6 +39,7 @@ const Contas = () => {
   const [dataDe, setDataDe] = useState(dateNow);
   const [dataAte, setDataAte] = useState(dateNow);
   const [contasFiltradas, setContasFiltradas] = useState([]);
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastSeverity, setToastSeverity] = useState('info');
@@ -141,34 +145,115 @@ const Contas = () => {
     }
   };
 
+  const cardsData = [
+    {
+      title: 'Total Mensal',
+      subtitle: '700',
+      body: 'Valor total de receitas do mês.',
+    },
+    {
+      title: 'Despesas',
+      subtitle: '800',
+      body: 'Valor total das despesas do mês.',
+    },
+    {
+      title: 'Saldo',
+      subtitle: '950',
+      body: 'Diferença entre receitas e despesas.',
+    },
+  ];
+
   return (
-    <Box p={4}>
+    <Box p={1}>
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: 2,
+          flexWrap: 'wrap',
+        }}
+      >
+        {cardsData.map(({ title, subtitle, body }, index) => (
+          <Card
+            key={index}
+            sx={{
+              maxWidth: 300,
+              maxHeight: 150,
+              background: 'linear-gradient(to bottom right, #3b82f6, #60a5fa)',
+              borderRadius: 4,
+              boxShadow: 6,
+              color: 'white',
+              flex: '1 1 300px',
+              marginBottom: 5,
+            }}
+          >
+            <CardContent>
+              <Typography gutterBottom sx={{ fontSize: 14, opacity: 0.9 }}>
+                {title}
+              </Typography>
+
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  letterSpacing: 1,
+                  fontSize: 25,
+                  opacity: 0.8,
+                  mb: 1.5,
+                }}
+              >
+                R$ {subtitle}
+              </Typography>
+
+              <Typography variant="body2" sx={{ opacity: 0.95 }}>
+                {body}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+
       <Box mb={4} display="flex" gap={2} alignItems="flex-end">
-        <TextField
-          label="Data De"
-          type="date"
-          value={dataDe}
-          onChange={(e) => setDataDe(e.target.value)}
-        />
-        <TextField
-          label="Data Até"
-          type="date"
-          value={dataAte}
-          onChange={(e) => setDataAte(e.target.value)}
-        />
-        <Button variant="contained" onClick={buscarContasFiltradas}>
-          Buscar
-        </Button>
         <Button
-          variant="outlined"
-          onClick={() => {
-            setDataDe(dateNow);
-            setDataAte(dateNow);
-            setContasFiltradas([]);
-          }}
+          variant="contained"
+          onClick={() => setMostrarFiltros(!mostrarFiltros)}
+          color={mostrarFiltros ? 'primary' : 'white'}
+          startIcon={<FilterListIcon />}
         >
-          Limpar filtro
+          Filtros
         </Button>
+        {mostrarFiltros && (
+          <>
+            <TextField
+              label="Data De"
+              type="date"
+              size="small"
+              value={dataDe}
+              onChange={(e) => setDataDe(e.target.value)}
+            />
+            <TextField
+              label="Data Até"
+              type="date"
+              size="small"
+              value={dataAte}
+              onChange={(e) => setDataAte(e.target.value)}
+            />
+            <Button variant="contained" onClick={buscarContasFiltradas}>
+              Buscar
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setDataDe(dateNow);
+                setDataAte(dateNow);
+                setContasFiltradas([]);
+              }}
+            >
+              Limpar filtro
+            </Button>
+          </>
+        )}
         <Button variant="contained" color="primary" onClick={() => setMostrarModal(true)}>
           Cadastrar conta
         </Button>

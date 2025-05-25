@@ -16,6 +16,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { formatDate } from '@shared/utils';
 
 const Table = ({ contas, onEditar, onExcluir }) => {
+  const contasOrdenadas = [...contas].sort(
+    (a, b) => new Date(a.nextPaymentDate) - new Date(b.nextPaymentDate)
+  );
+
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
       <MuiTable sx={{ minWidth: 650 }} aria-label="Tabela de contas">
@@ -29,7 +33,7 @@ const Table = ({ contas, onEditar, onExcluir }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {contas.map((conta) => (
+          {contasOrdenadas.map((conta) => (
             <TableRow
               key={conta._id}
               hover

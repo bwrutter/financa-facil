@@ -7,5 +7,11 @@
     "cache": true
   },
   "eslint.nodePath": "node_modules",
-  "prettier.prettierPath": "node_modules/prettier"
+  "prettier.prettierPath": "node_modules/prettier",
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

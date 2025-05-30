@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { createBill, getBills } from '../services/billsService';
+import { createBill, getBills, updateBill, deleteBill } from '../services/billsService';
 import { createCategory, getCategories } from '../services/categoryService';
+import { parseOfxFile } from '../utils/ofxParser';
 import Table from '../components/Table';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import RepeatIcon from '@mui/icons-material/Repeat';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import {
   Box,
   Card,
@@ -29,7 +31,14 @@ import {
   IconButton,
   Switch,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  Table as MuiTable,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material';
 
 const Contas = () => {
@@ -54,6 +63,17 @@ const Contas = () => {
   const [toastMsg, setToastMsg] = useState('');
   const [toastSeverity, setToastSeverity] = useState('info');
   const [filtroTipo, setFiltroTipo] = useState('todas'); // 'todas', 'recorrentes', 'nao-recorrentes'
+  const [contaParaEditar, setContaParaEditar] = useState(null);
+  const [modalImportacao, setModalImportacao] = useState(false);
+  const [bancoSelecionado, setBancoSelecionado] = useState('');
+  const [arquivoOfx, setArquivoOfx] = useState(null);
+  const [transacoes, setTransacoes] = useState([]);
+  const [carregandoTransacoes, setCarregandoTransacoes] = useState(false);
+
+  const bancos = [
+    { id: 'nubank', nome: 'Nubank' },
+    { id: 'mercadopago', nome: 'Mercado Pago' }
+  ];
 
   const calcularDespesasMesAtual = () => {
     const hoje = new Date();
@@ -121,6 +141,32 @@ const Contas = () => {
     carregarContas();
   }, [filtroTipo]);
 
+  const handleEditar = (conta) => {
+    setContaParaEditar(conta);
+    setNome(conta.name);
+    setValor(conta.value.toString());
+    setDescricao(conta.description || '');
+    setNextPaymentDate(conta.nextPaymentDate.split('T')[0]);
+    setRecorrente(conta.isRecurring || false);
+    setTipoRecorrencia(conta.recurrenceType || 'monthly');
+    setDiaRecorrencia(conta.recurrenceDay || 1);
+    setCategoriaSelecionada(conta.category?._id || '');
+    setMostrarModal(true);
+  };
+
+  const handleExcluir = async (conta) => {
+    if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
+      try {
+        await deleteBill(conta._id);
+        mostrarErro('Conta excluída com sucesso!', 'success');
+        await carregarContas();
+      } catch (error) {
+        console.error("Erro ao excluir conta:", error);
+        mostrarErro(error.response?.data?.error || 'Erro ao excluir conta', 'error');
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nome || !valor || !categoriaSelecionada) {
@@ -128,7 +174,7 @@ const Contas = () => {
       return;
     }
 
-    const novaConta = {
+    const dadosConta = {
       name: nome,
       value: parseFloat(valor),
       description: descricao,
@@ -142,14 +188,19 @@ const Contas = () => {
     };
 
     try {
-      await createBill(novaConta);
+      if (contaParaEditar) {
+        await updateBill(contaParaEditar._id, dadosConta);
+        mostrarErro('Conta atualizada com sucesso!', 'success');
+      } else {
+        await createBill(dadosConta);
+        mostrarErro('Conta criada com sucesso!', 'success');
+      }
       setMostrarModal(false);
       limparFormulario();
-      carregarContas();
-      mostrarErro('Conta criada com sucesso!', 'success');
+      await carregarContas();
     } catch (error) {
-      console.error("Erro ao criar conta:", error);
-      mostrarErro(error.response?.data?.error || 'Erro ao criar conta', 'error');
+      console.error("Erro ao salvar conta:", error);
+      mostrarErro(error.response?.data?.error || `Erro ao ${contaParaEditar ? 'atualizar' : 'criar'} conta`, 'error');
     }
   };
 
@@ -162,6 +213,12 @@ const Contas = () => {
     setTipoRecorrencia('monthly');
     setDiaRecorrencia(1);
     setCategoriaSelecionada('');
+    setContaParaEditar(null);
+  };
+
+  const handleFecharModal = () => {
+    setMostrarModal(false);
+    limparFormulario();
   };
 
   const criarNovaCategoria = async () => {
@@ -178,6 +235,84 @@ const Contas = () => {
     } catch (error) {
       console.error("Erro ao criar categoria:", error);
       mostrarErro('Erro ao criar categoria.', 'error');
+    }
+  };
+
+  const handleFecharModalImportacao = () => {
+    setModalImportacao(false);
+    setBancoSelecionado('');
+    setArquivoOfx(null);
+    setTransacoes([]);
+    setCarregandoTransacoes(false);
+  };
+
+  const handleSelecionarArquivo = async (event) => {
+    const arquivo = event.target.files[0];
+    if (arquivo && arquivo.name.toLowerCase().endsWith('.ofx')) {
+      setArquivoOfx(arquivo);
+      setCarregandoTransacoes(true);
+      try {
+        const transacoesExtraidas = await parseOfxFile(arquivo);
+        setTransacoes(transacoesExtraidas);
+      } catch (error) {
+        mostrarErro('Erro ao processar arquivo: ' + error.message, 'error');
+      } finally {
+        setCarregandoTransacoes(false);
+      }
+    } else {
+      mostrarErro('Por favor, selecione um arquivo OFX válido', 'error');
+      event.target.value = null;
+    }
+  };
+
+  const handleToggleTransacao = (id) => {
+    setTransacoes(transacoes.map(t =>
+      t.id === id ? { ...t, selected: !t.selected } : t
+    ));
+  };
+
+  const handleAtualizarTransacao = (id, campo, valor) => {
+    setTransacoes(transacoes.map(t =>
+      t.id === id ? { ...t, [campo]: valor } : t
+    ));
+  };
+
+  const handleImportarExtrato = async () => {
+    if (!bancoSelecionado) {
+      mostrarErro('Selecione um banco', 'warning');
+      return;
+    }
+
+    const transacoesSelecionadas = transacoes.filter(t => t.selected);
+    if (transacoesSelecionadas.length === 0) {
+      mostrarErro('Selecione pelo menos uma transação para importar', 'warning');
+      return;
+    }
+
+    try {
+      // Criar contas para cada transação selecionada
+      for (const transacao of transacoesSelecionadas) {
+        if (!transacao.name || !transacao.category) {
+          mostrarErro('Preencha o nome e a categoria para todas as transações selecionadas', 'warning');
+          return;
+        }
+
+        await createBill({
+          name: transacao.name,
+          value: transacao.amount,
+          description: transacao.description || transacao.originalDescription,
+          category: transacao.category,
+          nextPaymentDate: transacao.date,
+          isRecurring: false
+        });
+      }
+
+      mostrarErro(`${transacoesSelecionadas.length} contas importadas com sucesso!`, 'success');
+      handleFecharModalImportacao();
+      await carregarContas();
+    } catch (error) {
+      console.error("Erro ao importar contas:", error);
+      mostrarErro('Erro ao importar contas', 'error');
     }
   };
 
@@ -325,23 +460,33 @@ const Contas = () => {
             >
               Nova Conta
             </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<UploadFileIcon />}
+              onClick={() => setModalImportacao(true)}
+            >
+              Importar Extrato
+            </Button>
           </Stack>
         </Stack>
       </Box>
 
       <Table
         contas={contasFiltradas}
-        onEditar={(conta) => console.log('Editar:', conta)}
-        onExcluir={(conta) => console.log('Excluir:', conta)}
+        onEditar={handleEditar}
+        onExcluir={handleExcluir}
       />
 
       <Dialog
         open={mostrarModal}
-        onClose={() => setMostrarModal(false)}
+        onClose={handleFecharModal}
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Nova Conta</DialogTitle>
+        <DialogTitle>
+          {contaParaEditar ? 'Editar Conta' : 'Nova Conta'}
+        </DialogTitle>
         <DialogContent>
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
             <TextField
@@ -460,9 +605,174 @@ const Contas = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setMostrarModal(false)}>Cancelar</Button>
+          <Button onClick={handleFecharModal}>Cancelar</Button>
           <Button onClick={handleSubmit} variant="contained">
-            Salvar
+            {contaParaEditar ? 'Atualizar' : 'Salvar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={modalImportacao}
+        onClose={handleFecharModalImportacao}
+        maxWidth="xl"
+        fullWidth
+        PaperProps={{
+          sx: {
+            minHeight: '80vh',
+            maxHeight: '90vh'
+          }
+        }}
+      >
+        <DialogTitle>Importar Extrato Bancário</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Stack direction="row" spacing={2}>
+              <FormControl sx={{ minWidth: 200 }}>
+                <InputLabel>Banco</InputLabel>
+                <Select
+                  value={bancoSelecionado}
+                  onChange={(e) => setBancoSelecionado(e.target.value)}
+                  label="Banco"
+                >
+                  {bancos.map((banco) => (
+                    <MenuItem key={banco.id} value={banco.id}>
+                      {banco.nome}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Box sx={{ flexGrow: 1 }}>
+                <input
+                  accept=".ofx"
+                  style={{ display: 'none' }}
+                  id="arquivo-ofx"
+                  type="file"
+                  onChange={handleSelecionarArquivo}
+                />
+                <label htmlFor="arquivo-ofx">
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    startIcon={<UploadFileIcon />}
+                    fullWidth
+                  >
+                    {arquivoOfx ? arquivoOfx.name : 'Selecionar arquivo OFX'}
+                  </Button>
+                </label>
+                {arquivoOfx && (
+                  <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                    Arquivo selecionado: {arquivoOfx.name}
+                  </Typography>
+                )}
+              </Box>
+            </Stack>
+
+            {carregandoTransacoes && (
+              <Typography>Carregando transações...</Typography>
+            )}
+
+            {transacoes.length > 0 && (
+              <TableContainer
+                component={Paper}
+                sx={{
+                  maxHeight: '60vh',
+                  '& .MuiTableCell-root': {
+                    px: 2,
+                    py: 1,
+                    whiteSpace: 'nowrap'
+                  }
+                }}
+              >
+                <MuiTable size="small" stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox" sx={{ position: 'sticky', left: 0, bgcolor: 'background.paper', zIndex: 1200 }}>
+                        <Checkbox
+                          checked={transacoes.every(t => t.selected)}
+                          indeterminate={transacoes.some(t => t.selected) && !transacoes.every(t => t.selected)}
+                          onChange={() => {
+                            const todosSelecionados = transacoes.every(t => t.selected);
+                            setTransacoes(transacoes.map(t => ({ ...t, selected: !todosSelecionados })));
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ minWidth: 100 }}>Data</TableCell>
+                      <TableCell sx={{ minWidth: 120 }}>Valor</TableCell>
+                      <TableCell sx={{ minWidth: 200 }}>Nome</TableCell>
+                      <TableCell sx={{ minWidth: 150 }}>Categoria</TableCell>
+                      <TableCell sx={{ minWidth: 250 }}>Descrição do Extrato</TableCell>
+                      <TableCell sx={{ minWidth: 250 }}>Sua Descrição</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {transacoes.map((transacao) => (
+                      <TableRow key={transacao.id} hover>
+                        <TableCell padding="checkbox" sx={{ position: 'sticky', left: 0, bgcolor: 'background.paper' }}>
+                          <Checkbox
+                            checked={transacao.selected}
+                            onChange={() => handleToggleTransacao(transacao.id)}
+                          />
+                        </TableCell>
+                        <TableCell>{transacao.date}</TableCell>
+                        <TableCell>{formatarMoeda(transacao.amount)}</TableCell>
+                        <TableCell>
+                          <TextField
+                            size="small"
+                            value={transacao.name}
+                            onChange={(e) => handleAtualizarTransacao(transacao.id, 'name', e.target.value)}
+                            fullWidth
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <FormControl fullWidth size="small">
+                            <Select
+                              value={transacao.category}
+                              onChange={(e) => handleAtualizarTransacao(transacao.id, 'category', e.target.value)}
+                            >
+                              {categorias.map((cat) => (
+                                <MenuItem key={cat._id} value={cat._id}>
+                                  {cat.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip title={transacao.originalDescription}>
+                            <Typography noWrap>
+                              {transacao.originalDescription}
+                            </Typography>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            size="small"
+                            value={transacao.description}
+                            onChange={(e) => handleAtualizarTransacao(transacao.id, 'description', e.target.value)}
+                            placeholder="Digite uma descrição..."
+                            fullWidth
+                            multiline
+                            maxRows={2}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </MuiTable>
+              </TableContainer>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleFecharModalImportacao}>Cancelar</Button>
+          <Button
+            onClick={handleImportarExtrato}
+            variant="contained"
+            disabled={!bancoSelecionado || transacoes.length === 0 || !transacoes.some(t => t.selected)}
+          >
+            Importar Selecionados
           </Button>
         </DialogActions>
       </Dialog>

@@ -40,3 +40,47 @@ export const deleteBill = async (id) => {
   const response = await axios.delete(`${API_URL}/${id}`, { headers });
   return response.data;
 };
+
+export const billsService = {
+  // Buscar todas as contas
+  getAll: async () => {
+    const headers = await getAuthHeader();
+    const response = await axios.get(API_URL, { headers });
+    return response.data;
+  },
+
+  // Buscar contas recorrentes próximas do vencimento
+  getUpcoming: async (days = 7) => {
+    const headers = await getAuthHeader();
+    const response = await axios.get(`${API_URL}/upcoming?days=${days}`, { headers });
+    return response.data;
+  },
+
+  // Criar nova conta
+  create: async (billData) => {
+    const headers = await getAuthHeader();
+    const response = await axios.post(API_URL, billData, { headers });
+    return response.data;
+  },
+
+  // Atualizar conta
+  update: async (id, billData) => {
+    const headers = await getAuthHeader();
+    const response = await axios.put(`${API_URL}/${id}`, billData, { headers });
+    return response.data;
+  },
+
+  // Deletar conta
+  delete: async (id) => {
+    const headers = await getAuthHeader();
+    const response = await axios.delete(`${API_URL}/${id}`, { headers });
+    return response.data;
+  },
+
+  // Processar pagamento recorrente
+  processPayment: async (id) => {
+    const headers = await getAuthHeader();
+    const response = await axios.post(`${API_URL}/${id}/process-payment`, {}, { headers });
+    return response.data;
+  }
+};

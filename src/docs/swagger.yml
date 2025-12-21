@@ -1,0 +1,242 @@
+openapi: 3.0.3
+info:
+  title: Finança Fácil API
+  version: 1.0.0
+  description: API para gerenciamento de finanças pessoais
+servers:
+  - url: http://localhost:3000
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        id:
+          type: string
+          example: 69486e084fe50fbdc803f57c
+        name:
+          type: string
+          example: Bryan Teste
+        email:
+          type: string
+          example: bryan2@email.com
+    Account:
+      type: object
+      required:
+        - name
+        - balance
+      properties:
+        id:
+          type: string
+          example: 69486e084fe50fbdc803f57d
+        name:
+          type: string
+          example: Conta Corrente
+        balance:
+          type: number
+          example: 1000
+        userId:
+          type: string
+          example: 69486e084fe50fbdc803f57c
+    Transaction:
+      type: object
+      required:
+        - accountId
+        - type
+        - amount
+        - category
+      properties:
+        id:
+          type: string
+          example: 69486e084fe50fbdc803f57e
+        accountId:
+          type: string
+          example: 69486e084fe50fbdc803f57d
+        type:
+          type: string
+          enum: [income, expense]
+          example: income
+        amount:
+          type: number
+          example: 200
+        category:
+          type: string
+          example: Salário
+        description:
+          type: string
+          example: Salário de dezembro
+        date:
+          type: string
+          format: date-time
+          example: 2025-12-21T10:00:00Z
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Registrar usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Usuário já existe
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login de usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login bem-sucedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Credenciais inválidas
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Listar contas do usuário
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de contas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+    post:
+      tags:
+        - Accounts
+      summary: Criar nova conta
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - balance
+              properties:
+                name:
+                  type: string
+                balance:
+                  type: number
+      responses:
+        '201':
+          description: Conta criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+  /transactions:
+    get:
+      tags:
+        - Transactions
+      summary: Listar transações
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de transações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+    post:
+      tags:
+        - Transactions
+      summary: Criar nova transação
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - accountId
+                - type
+                - amount
+                - category
+              properties:
+                accountId:
+                  type: string
+                type:
+                  type: string
+                  enum: [income, expense]
+                amount:
+                  type: number
+                category:
+                  type: string
+                description:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Transação criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'

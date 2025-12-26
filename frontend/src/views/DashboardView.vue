@@ -12,7 +12,9 @@
         <AccountCard :account="account" />
       </v-col>
     </v-row>
-
+    <v-btn variant="tonal" base-color="blue" class="ma-4">
+      Button
+    </v-btn>
     <v-alert
       v-if="accounts.length === 0"
       type="info"

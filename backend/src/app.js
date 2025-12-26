@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import authRoutes from "./modules/auth/auth.router.js";
 import accountRoutes from "./modules/accounts/account.routes.js";
 import transactionRoutes from "./modules/transactions/transaction.routes.js";
@@ -10,6 +11,7 @@ const swaggerDocument = yaml.load(fs.readFileSync("./src/docs/swagger.yml", "utf
 
 const app = express();
 
+app.use(cors());
 app.use(express.json())
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/auth", authRoutes);

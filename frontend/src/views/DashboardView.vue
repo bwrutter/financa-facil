@@ -1,41 +1,29 @@
 <template>
-  <v-container>
-    <h1 class="mb-4">Minhas Contas</h1>
+  <v-row>
+    <v-col cols="12" md="4">
+      <SummaryCard title="Saldo Total" value="R$ 5.230,00" color="green" />
+    </v-col>
 
-    <v-row>
-      <v-col
-        v-for="account in accounts"
-        :key="account._id"
-        cols="12"
-        md="4"
-      >
-        <AccountCard :account="account" />
-      </v-col>
-    </v-row>
+    <v-col cols="12" md="4">
+      <SummaryCard title="Receitas" value="R$ 8.000,00" color="blue" />
+    </v-col>
 
-    <v-alert
-      v-if="accounts.length === 0"
-      type="info"
-      variant="tonal"
-    >
-      Você ainda não possui contas cadastradas.
-    </v-alert>
-  </v-container>
+    <v-col cols="12" md="4">
+      <SummaryCard title="Despesas" value="R$ 2.770,00" color="red" />
+    </v-col>
+
+    <v-col cols="12" md="6">
+      <AccountCard />
+    </v-col>
+
+    <v-col cols="12" md="6">
+      <TransactionTable />
+    </v-col>
+  </v-row>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { getAccounts } from "@/services/account.service";
-import AccountCard from "@/components/AccountCard.vue";
-
-const accounts = ref([]);
-
-onMounted(async () => {
-  try {
-    const { data } = await getAccounts();
-    accounts.value = data;
-  } catch (err) {
-    console.error("Erro ao carregar contas", err);
-  }
-});
+import SummaryCard from "@/components/SummaryCard.vue"
+import AccountCard from "@/components/AccountCard.vue"
+import TransactionTable from "@/components/TransactionTable.vue"
 </script>
